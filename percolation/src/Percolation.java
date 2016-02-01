@@ -8,7 +8,7 @@ public class Percolation {
 
     private WeightedQuickUnionUF uf,uf2;
     private int n = 0;
-    private int[][] grid;
+    private boolean[][] grid;
     private int virtualTopSite = 0;
     private int virtualBottomSite = 0;
 
@@ -18,10 +18,10 @@ public class Percolation {
 
         virtualTopSite = N * N;
         virtualBottomSite = N * N + 1;
-        this.grid = new int[N][N];
+        this.grid = new boolean[N][N];
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
-                grid[i][j] = 0;
+                grid[i][j] = false;
             }
         }
 
@@ -38,7 +38,7 @@ public class Percolation {
 
     public boolean isOpen(int row, int col) {
         validateBounds(row, col);
-        return this.grid[row - 1][col - 1] == 1;
+        return this.grid[row - 1][col - 1] == true;
     }
 
     public void open(int row, int col) {
@@ -75,7 +75,7 @@ public class Percolation {
             uf2.union(a, virtualTopSite);
         }
 
-        this.grid[row - 1][col - 1] = 1;
+        this.grid[row - 1][col - 1] = true;
     }
 
     public boolean percolates() {
