@@ -20,11 +20,18 @@ public class Deque<Item> implements Iterable<Item> {
 
     private class DequeIterator implements Iterator<Item>
     {
-        private Node current = first;
+        private Node current;
+
+        DequeIterator(){
+            current = first;
+        }
+
         public boolean hasNext() { return current != null; }
         public void remove() { throw new UnsupportedOperationException(); }
         public Item next()
         {
+            if(current == null)
+                throw new java.util.NoSuchElementException();
             Item item = current.item;
             current = current.next;
             return item;
@@ -122,7 +129,7 @@ public class Deque<Item> implements Iterable<Item> {
         return new DequeIterator();
     }
 
-    @Override
+    /*@Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
         for (Item item :this) {
@@ -130,7 +137,7 @@ public class Deque<Item> implements Iterable<Item> {
         }
         builder.deleteCharAt(builder.length()-1);
         return builder.toString();
-    }
+    }*/
 
     public static void main(String[] args) {
         Deque<Integer> deque = new Deque<Integer>();
@@ -138,6 +145,12 @@ public class Deque<Item> implements Iterable<Item> {
         for (int i = 0; i < 10; i++) {
             deque.addFirst(i);
         }
+
+        for (int i : deque){
+            System.out.print(i);
+        }
+
+        System.out.print("\n");
 
         for (int i = 0; i < 5; i++) {
             deque.removeFirst();
