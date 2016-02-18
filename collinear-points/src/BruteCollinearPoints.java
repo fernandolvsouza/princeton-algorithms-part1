@@ -18,26 +18,40 @@ public class BruteCollinearPoints {
         if (points == null)
             throw new java.lang.NullPointerException();
 
-        for (Point p : points) {
-            if (p == null)
-                throw new java.lang.NullPointerException();
+        Point[] naturalSorted = new Point[points.length];
+
+        for (int i = 0; i < points.length; i++) {
+            naturalSorted[i] = points[i];
         }
 
-        for (int p = 0; p < points.length - 3; p++) {
-            for (int q = p + 1; q < points.length - 2; q++) {
-                for (int r = q + 1; r < points.length - 1; r++) {
-                    for (int s = r + 1; s < points.length; s++) {
-                        double slopePQ = points[p].slopeTo(points[q]);
-                        double slopePR = points[p].slopeTo(points[r]);
-                        double slopePS = points[p].slopeTo(points[s]);
+        Arrays.sort(naturalSorted);
+
+        for (int i = 0; i < naturalSorted.length; i++) {
+            if (naturalSorted[i] == null)
+                throw new java.lang.NullPointerException();
+
+            if (i + 1 == naturalSorted.length)
+                continue;
+
+            if (naturalSorted[i].compareTo(naturalSorted[i + 1]) == 0)
+                throw new java.lang.IllegalArgumentException();
+        }
+
+        for (int p = 0; p < naturalSorted.length - 3; p++) {
+            for (int q = p + 1; q < naturalSorted.length - 2; q++) {
+                for (int r = q + 1; r < naturalSorted.length - 1; r++) {
+                    for (int s = r + 1; s < naturalSorted.length; s++) {
+                        double slopePQ = naturalSorted[p].slopeTo(naturalSorted[q]);
+                        double slopePR = naturalSorted[p].slopeTo(naturalSorted[r]);
+                        double slopePS = naturalSorted[p].slopeTo(naturalSorted[s]);
 
 
                         if (slopePQ == slopePR && slopePQ == slopePS) {
                             Point[] line = new Point[4];
-                            line[0] = points[p];
-                            line[1] = points[q];
-                            line[2] = points[r];
-                            line[3] = points[s];
+                            line[0] = naturalSorted[p];
+                            line[1] = naturalSorted[q];
+                            line[2] = naturalSorted[r];
+                            line[3] = naturalSorted[s];
 
                             Arrays.sort(line);
                             LineSegment segment = new LineSegment(line[0], line[3]);
