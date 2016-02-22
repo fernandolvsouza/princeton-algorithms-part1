@@ -7,7 +7,7 @@ import java.util.List;
 public class Board {
 
     private int[][] blocks;
-    private int N;
+    private int N, manhattan = -1, hamming = -1;
 
     // construct a board from an N-by-N array of blocks
     public Board(int[][] blocks) {
@@ -20,13 +20,6 @@ public class Board {
         }
     }
 
-
-    class SearchNode {
-        SearchNode previous;
-        int moves = 0;
-        Board board;
-    }
-
     // (where blocks[i][j] = block in row i, column j)
     // board dimension N
     public int dimension() {
@@ -35,29 +28,44 @@ public class Board {
 
     // number of blocks out of place
     public int hamming() {
+        if(hamming > -1)
+            return hamming;
         int count = 0;
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
-                if (blocks[i][j] != i * N + j + 1 ) {
+                if(blocks[i][j] == 0)
+                    continue;
+
+                if (blocks[i][j] != i * N + j + 1) {
                     count++;
                 }
             }
         }
+        hamming = count;
         return count;
     }
 
     // sum of Manhattan distances between blocks and goal
     public int manhattan() {
+        if(manhattan > -1)
+            return manhattan;
         int count = 0;
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
-                int g_i = blocks[i][j] / N;
-                int g_j = blocks[i][j] % N - 1;
 
-                count = count + Math.abs(g_i - i) + Math.abs(g_j - j);
+                if(blocks[i][j] == 0)
+                    continue;
+
+                if (blocks[i][j] != i * N + j + 1) {
+                    int g_i = (blocks[i][j] - 1) / N;
+                    int g_j = (blocks[i][j] - 1) % N ;
+                    count = count + Math.abs(g_i - i) + Math.abs(g_j - j);
+                }
             }
         }
+        manhattan = count;
         return count;
+
     }
 
     // is this board the goal board?
@@ -67,24 +75,32 @@ public class Board {
 
     // a board that is obtained by exchanging any pair of blocks
     public Board twin() {
+        int[] i_exch = new int[2];
+        int[] j_exch = new int[2];
+        int aux_index = 0;
+
         int[][] twin_blocks = new int[N][N];
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
+                if(blocks[i][j] != 0 && aux_index < 2){
+                    i_exch[aux_index] = i;
+                    j_exch[aux_index] = j;
+                    aux_index++;
+                }
+
                 twin_blocks[i][j] = blocks[i][j];
             }
         }
 
-        if(N > 1) {
-            int aux = twin_blocks[0][0];
-            twin_blocks[0][0] = twin_blocks[0][1];
-            twin_blocks[0][1] = aux;
-        }
-
+        int aux = twin_blocks[i_exch[0]][j_exch[0]];
+        twin_blocks[i_exch[0]][j_exch[0]] = twin_blocks[i_exch[1]][j_exch[1]];
+        twin_blocks[i_exch[1]][j_exch[1]] = aux;
 
         return new Board(twin_blocks);
     }
 
     // does this board equal y?
+    @Override
     public boolean equals(Object y) {
         if (y == null)
             return false;
@@ -134,7 +150,12 @@ public class Board {
         return n_boards;
     }
 
-    private void neighbors_exch(List n_boards, int[][] e_blocks, int i, int j, int i2, int j2) {
+    private void neighbors_exch(List<Board> n_boards, int[][] e_blocks, int i, int j, int i2, int j2) {
+        if(i < 0 || i >= N || j < 0 || j >= N )
+            return;
+        if(i2 < 0 || i2 >= N || j2 < 0 || j2 >= N )
+            return;
+
         int aux =  e_blocks[i][j];
         e_blocks[i][j] = e_blocks[i2][j2];
         e_blocks[i2][j2] = aux;
@@ -147,38 +168,50 @@ public class Board {
 
     // string representation of this board (in the output format specified below)
     public String toString() {
+        StringBuilder b = new StringBuilder( N + "\n");
         for (int i = 0; i < N; i++) {
+            b.append(" ");
             for (int j = 0; j < N; j++) {
-                System.out.print(blocks[i][j]);
+                b.append(blocks[i][j]);
                 if (j < N - 1)
-                    System.out.print(" ");
+                    b.append(" ");
             }
-            System.out.print("\n");
+            b.append("\n");
         }
 
-        return null;
+        return b.toString();
     }
 
     // unit tests (not graded)
     public static void main(String[] args) {
-        int[][] test_blocks = new int[3][3];
-        test_blocks[0][0] = 8;
-        test_blocks[0][1] = 1;
-        test_blocks[0][2] = 2;
-
-        test_blocks[1][0] = 4;
-        test_blocks[1][1] = 0;
-        test_blocks[1][2] = 2;
-
-        test_blocks[2][0] = 7;
-        test_blocks[2][1] = 6;
-        test_blocks[2][2] = 5;
+        int[][] test_blocks = {{8,1,3},{4,0,2},{7,6,5}};//new int[3][3];
 
         Board b = new Board(test_blocks);
         System.out.println(b.hamming());
         System.out.println( b.manhattan());
-        assert b.hamming() == 5;
-        assert b.manhattan() == 10;
+        System.out.println("neighbors of \n" + b + "are: ");
+        for (Board n : b.neighbors()) {
+            System.out.println( n);
+        }
 
+        System.out.println("twin : \n" + b.twin());
+        int[][] test_blocks2 = {{0,1,3},{4,8,2},{7,6,5}};//new int[3][3];
+
+        Board b2 = new Board(test_blocks2);
+
+        System.out.println("neighbors of \n" + b2 + "are: ");
+        for (Board n : b2.neighbors()) {
+            System.out.println(n);
+        }
+
+        System.out.println("twin : \n" + b2.twin());
+
+        int[][] test = { {1,2}, {3,0}};
+        int[][] test2 = { {1,2}, {3,0}};
+
+        System.out.println( new Board(test).equals(new Board(test2)));
+
+        int[][] test3 = {{1, 2,3,4},{5,6,12,7},{9,10, 8, 0},{13, 14, 11, 15}};
+        System.out.println( new Board(test3).manhattan());
     }
 }
