@@ -7,7 +7,7 @@ import java.util.*;
  */
 public class PointSET {
 
-    private RedBlackBST<Point2D,Point2D> points;
+    private RedBlackBST<Point2D, Point2D> points;
 
     public PointSET() {
         points = new RedBlackBST<>();
@@ -22,13 +22,13 @@ public class PointSET {
     }                         // number of points in the set
 
     public void insert(Point2D p) {
-        if(p == null)
+        if (p == null)
             throw new java.lang.NullPointerException();
-        points.put(p,p);
+        points.put(p, p);
     }             // add the point to the set (if it is not already in the set)
 
     public boolean contains(Point2D p) {
-        if(p == null)
+        if (p == null)
             throw new java.lang.NullPointerException();
         return points.contains(p);
     }           // does the set contain point p?
@@ -42,11 +42,11 @@ public class PointSET {
     }                         // draw all points to standard draw
 
     public Iterable<Point2D> range(RectHV rect) {
-        if(rect == null)
+        if (rect == null)
             throw new java.lang.NullPointerException();
-        List<Point2D> r =  new ArrayList<>();
+        List<Point2D> r = new ArrayList<>();
         for (Point2D p : points.keys()) {
-            if(rect.contains(p))
+            if (rect.contains(p))
                 r.add(p);
         }
         return r;
@@ -54,15 +54,15 @@ public class PointSET {
     }             // all points that are inside the rectangle
 
     public Point2D nearest(Point2D p) {
-        if(p == null)
+        if (p == null)
             throw new java.lang.NullPointerException();
 
         Point2D nearest = null;
         double nearest_distance = Double.MAX_VALUE;
-        for(Point2D other : points.keys()) {
+        for (Point2D other : points.keys()) {
             double d = other.distanceSquaredTo(p);
 
-            if(other.distanceSquaredTo(p) <  nearest_distance){
+            if (other.distanceSquaredTo(p) < nearest_distance) {
                 nearest_distance = d;
                 nearest = other;
             }
@@ -85,8 +85,8 @@ public class PointSET {
             brute.insert(p);
         }
         brute.draw();
-        Point2D p = new Point2D(0.4,0);
-        Point2D n =  brute.nearest(p);
+        Point2D p = new Point2D(0.4, 0);
+        Point2D n = brute.nearest(p);
 
         StdDraw.setPenColor(StdDraw.RED);
         StdDraw.setPenRadius(.01);
@@ -95,13 +95,13 @@ public class PointSET {
         n.draw();
         System.out.println("near [ " + p + "] = " + n);
 
-        RectHV rect = new RectHV(0.0,0.01,0.5,0.5);
-        Iterable<Point2D> matches =  brute.range(rect);
+        RectHV rect = new RectHV(0.0, 0.01, 0.5, 0.5);
+        Iterable<Point2D> matches = brute.range(rect);
 
         StdDraw.setPenColor(StdDraw.GREEN);
         StdDraw.setPenRadius(.01);
         rect.draw();
-        for (Point2D m: matches) {
+        for (Point2D m : matches) {
             m.draw();
         }
 
